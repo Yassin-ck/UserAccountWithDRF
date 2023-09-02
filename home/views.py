@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import User
-from .serializers import UserRegistrationSerializer,UserLoginSerializer,UserProfileSerializer,ProfileCRUDSerializer
+from .serializers import UserRegistrationSerializer,UserLoginSerializer,UserProfileSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,19 +18,11 @@ class UserRegistrationView(APIView):
     def post(self,request,format=None):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid ():
-            profile_pictures = serializer.validated_data.get('profile_picture')
-            names = serializer.validated_data['name']
-            print(type(profile_pictures),'kjuhg',profile_pictures)
-            print(type(names),'kjuhg',names)
-            
             user = User.objects.create_user(
-                name=names,
+                username = serializer.validated_data['username'],
                 email=serializer.validated_data['email'] ,
-                password=serializer.validated_data['password'],
-                profile_picture=profile_pictures
+                password=serializer.validated_data['password']
             )
-            print(user.profile_picture,'userpro')
-            print(user.name,'userpro')
             return Response({"msg":"User Registrerd Succesfully"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -38,13 +30,10 @@ class UserRegistrationView(APIView):
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
-    
-    
     
 class UserLoginView(APIView):
     serializer_class = UserLoginSerializer
@@ -62,9 +51,18 @@ class UserLoginView(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
     
+class UserProfileView(APIView):
+    serializer_class = UserProfileSerializer
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self,request,format=None):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
 
 class ProfileCRUD(APIView):
-    serializer_class = ProfileCRUDSerializer
+    serializer_class = UserProfileSerializer
     permission_classes = [IsAdminUser]
     renderer_classes = [UserRenderer]
     filter_backends = [SearchFilter]
@@ -72,15 +70,18 @@ class ProfileCRUD(APIView):
 
     def get(self,request):
         user = User.objects.all()
-        serializer = ProfileCRUDSerializer(user,many=True)
+        serializer = UserProfileSerializer(user,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     def put(self,request,pk=None):
         id = pk
         if id is not None:
             user = User.objects.get(pk=id)
-            serializer = ProfileCRUDSerializer(user,data=request.data,partial=True)
+            serializer = UserProfileSerializer(user,data=request.data,partial=True)
             if serializer.is_valid():
+                first_name = serializer.validated_data['first_name']
+                last_name = serializer.validated_data['last_name']
+                profile_picture = serializer.validated_data['profile_picture']
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -95,15 +96,6 @@ class ProfileCRUD(APIView):
             user.delete()
             return Response({"msg": "User Deleted!!!"}, status=status.HTTP_200_OK)
 
-    
-class UserProfileView(APIView):
-    serializer_class = UserProfileSerializer
-    renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
-    def get(self,request,format=None):
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
     
 
 

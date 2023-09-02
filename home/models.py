@@ -1,24 +1,23 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager,AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager,AbstractBaseUser,AbstractUser
 
 # custom manager
 class UserManager(BaseUserManager):
-    def create_user(self,name,email,password=None,profile_picture=None,**extra_fields):
+    def create_user(self,username,email,password=None,**extra_fields):
         if not email:
             raise ValueError('User mush have an Email Address')
         user = self.model(
             email = self.normalize_email(email),
-            name = name,
-            profile_picture = profile_picture
+            username = username
         )
         
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self,name,email,password=None):
+    def create_superuser(self,username,email,password=None):
         user = self.create_user(
-            name,
+            username,
             email,
             password=password,
         )
@@ -29,10 +28,12 @@ class UserManager(BaseUserManager):
     
 # custom user
 class User(AbstractBaseUser):
-    name = models.CharField(max_length=100)
+    username = models.CharField(max_length=100)
     email = models.EmailField(unique=True,
                               max_length=255,
                               verbose_name='Email')
+    first_name = models.CharField(max_length=100,null=True,blank=True)
+    last_name = models.CharField(max_length=100,null=True,blank=True)
     profile_picture = models.ImageField(null=True,blank=True,upload_to='profile_photo/')
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -44,7 +45,7 @@ class User(AbstractBaseUser):
     
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+    REQUIRED_FIELDS = ['username']
     
     def has_perm(self,perm,obj=None):
         "Does this user have a specific permission?"

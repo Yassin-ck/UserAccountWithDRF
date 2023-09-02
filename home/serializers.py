@@ -6,10 +6,9 @@ import re
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type':'password'},write_only=True)
-    profile_picture = serializers.FileField(required=False)
     class Meta:
         model = User
-        fields = ['name','email','password','profile_picture','password2']
+        fields = ['username','email','password','password2']
         extra_kwargs = {
             'password':{'write_only':True}
         }
@@ -18,11 +17,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, data):
         password = data.get('password')
         password2 = data.get('password2')
-        name = data.get('name')
+        username = data.get('username')
         if password != password2 :
             raise serializers.ValidationError('password doesnot match')
-        elif re.match(r"^\d{1,3}", name):   
-            raise serializers.ValidationError('Name should Start with Alphabets')
+        elif re.match(r"^\d{1,3}", username):   
+            raise serializers.ValidationError('Usernae should Start with Alphabets')
         return data
      
 
@@ -33,18 +32,10 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ['email','password']
         
         
-    
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.FileField(required=False)
     class Meta:
         model = User
-        fields = ['id','name','email','profile_picture']    
-         
-    
-
-class ProfileCRUDSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(read_only=True)
-    class Meta:
-        model = User
-        fields = ['id','name','email','profile_picture']
+        fields = ['id','first_name','last_name','username','email','profile_picture']
 
