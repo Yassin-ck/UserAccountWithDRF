@@ -68,11 +68,13 @@ class UserProfileEdit(APIView):
     filter_backends = [SearchFilter]
     search_fields = ['^name','=email']
 
-    def get(self,request):
-        user = User.objects.all()
-        serializer = UserProfileSerializer(user,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
+    def get(self,request,pk=None):
+        id = pk
+        if id is None:
+            user = User.objects.all()
+            serializer = UserProfileSerializer(user,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response({"msg":"GET method not Allowed here !!!"})
     def put(self,request,pk=None):
         id = pk
         if id is not None:
@@ -80,7 +82,7 @@ class UserProfileEdit(APIView):
             serializer = UserProfileSerializer(user,data=request.data,partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data,status=status.HTTP_200_OK)
+                return Response({"msg":"Profile Updated","profile":serializer.data},status=status.HTTP_200_OK)
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response({'msg':'Select a User'})
     def delete(self, request, pk=None):
@@ -95,5 +97,6 @@ class UserProfileEdit(APIView):
         return Response({'msg':'Select a User'})
 
     
-
-
+class InvalidURLView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"error": "Invalid URL path"}, status=status.HTTP_404_NOT_FOUND)
