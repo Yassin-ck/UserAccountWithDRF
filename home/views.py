@@ -18,7 +18,7 @@ class UserRegistrationView(APIView):
     def post(self,request,format=None):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid ():
-            user = User.objects.create_user(
+            User.objects.create_user(
                 username = serializer.validated_data['username'],
                 email=serializer.validated_data['email'] ,
                 password=serializer.validated_data['password']
@@ -61,7 +61,7 @@ class UserProfileView(APIView):
     
     
 
-class ProfileCRUD(APIView):
+class UserProfileEdit(APIView):
     serializer_class = UserProfileSerializer
     permission_classes = [IsAdminUser]
     renderer_classes = [UserRenderer]
@@ -79,13 +79,10 @@ class ProfileCRUD(APIView):
             user = User.objects.get(pk=id)
             serializer = UserProfileSerializer(user,data=request.data,partial=True)
             if serializer.is_valid():
-                first_name = serializer.validated_data['first_name']
-                last_name = serializer.validated_data['last_name']
-                profile_picture = serializer.validated_data['profile_picture']
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
+        return Response({'msg':'Select a User'})
     def delete(self, request, pk=None):
         id=pk
         if id is not None:
@@ -95,6 +92,7 @@ class ProfileCRUD(APIView):
                 return Response({"msg": "User Doesn't Exist!!!"}, status=status.HTTP_404_NOT_FOUND)
             user.delete()
             return Response({"msg": "User Deleted!!!"}, status=status.HTTP_200_OK)
+        return Response({'msg':'Select a User'})
 
     
 

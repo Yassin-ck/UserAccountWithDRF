@@ -25,8 +25,8 @@ urlpatterns = [
     path('',views.UserRegistrationView.as_view(),name='registration'),
     path('login/',views.UserLoginView.as_view(),name='login'),
     path('profile/',views.UserProfileView.as_view(),name='profile'),
-    path('profilecrud/',views.ProfileCRUD.as_view(),name='profilecrud'),
-    path('profilecrud/<int:pk>/',views.ProfileCRUD.as_view(),name='profilecrud'),
+    path('profilecrud/',views.UserProfileEdit.as_view(),name='profilecrud'),
+    path('profilecrud/<int:pk>/',views.UserProfileEdit.as_view(),name='profilecrud'),
     
     
     

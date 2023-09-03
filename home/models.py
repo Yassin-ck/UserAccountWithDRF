@@ -8,7 +8,7 @@ class UserManager(BaseUserManager):
             raise ValueError('User mush have an Email Address')
         user = self.model(
             email = self.normalize_email(email),
-            username = username
+            username = username,
         )
         
         user.set_password(password)
