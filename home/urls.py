@@ -28,6 +28,4 @@ urlpatterns = [
     path('profilecrud/',views.UserProfileEdit.as_view(),name='profilecrud'),
     path('profilecrud/<int:pk>/',views.UserProfileEdit.as_view(),name='profilecrud'),
     
-    
-    
 ]
