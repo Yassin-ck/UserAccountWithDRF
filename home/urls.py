@@ -25,6 +25,6 @@ urlpatterns = [
    path('profile/',views.UserProfileView.as_view(),name='profile'),
    path('profilecrud/',views.UserProfileEdit.as_view(),name='profilecrud'),
    path('profilecrud/<int:pk>/',views.UserProfileEdit.as_view(),name='profilecrud'),
-   re_path(r'^.*$', views.InvalidURLView.as_view(), name="invalid-url"),
+   re_path(r'^.*$', views.url_check, name="invalid-url"),
 
 ]

@@ -9,6 +9,7 @@ from .renders import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated,IsAdminUser,AllowAny
 from rest_framework.filters import SearchFilter
+from rest_framework.decorators import api_view
 
 
 class UserRegistrationView(APIView):
@@ -92,7 +93,6 @@ class UserProfileEdit(APIView):
             return Response({"msg": "User Deleted!!!"}, status=status.HTTP_200_OK)
         return Response({'msg':'Select a User'})
 
-    
-class InvalidURLView(APIView):
-    def get(self, request, *args, **kwargs):
+@api_view(['GET','POST','PUT','PATCH','DELETE'])  
+def url_check(request, *args, **kwargs):
         return Response({"error": "Invalid URL path"}, status=status.HTTP_404_NOT_FOUND)
