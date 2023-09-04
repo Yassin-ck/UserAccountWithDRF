@@ -23,7 +23,7 @@ class UserRegistrationView(APIView):
                 email=serializer.validated_data['email'] ,
                 password=serializer.validated_data['password']
             )
-            return Response({"msg":"User Registrerd Succesfully"},status=status.HTTP_201_CREATED)
+            return Response({"msg":"User Registrerd Succesfully","User":serializer.data},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -33,7 +33,7 @@ def get_tokens_for_user(user):
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
-    }
+    }   
     
 class UserLoginView(APIView):
     serializer_class = UserLoginSerializer
